@@ -22,10 +22,17 @@ fn main() {
 
     let input = &fs::read_to_string(cli_args.input).unwrap();
     let rounds = input.split_terminator("\n");
+
+    //
+    // Part 1 solution
+    //
+
     let mut sum = 0;
     for (idx, round) in rounds.enumerate() {
         println!("Scoring round {}", round);
-        let throws = parse_round(round);
+        // parser for part 1
+        // let throws = parse_round_as_throws(round);
+        let throws = parse_round_as_result(round); // parser for part 2
         let score = score_round(throws[1], throws[0]);
         sum += score;
         println!("Round {} score: {}\n", idx, score);
@@ -81,10 +88,39 @@ impl FromStr for Throw {
     }
 }
 
-fn parse_round(s: &str) -> Vec<Throw> {
+fn parse_round_as_throws(s: &str) -> Vec<Throw> {
     s.split_terminator(" ")
         .map(|t| Throw::from_str(t).unwrap())
         .collect()
+}
+
+fn parse_round_as_result(s: &str) -> Vec<Throw> {
+    let entries: Vec<&str> = s.split_terminator(" ").collect();
+    vec![
+        Throw::from_str(entries[0]).unwrap(),
+        get_desired_throw(Throw::from_str(entries[0]).unwrap(), entries[1]).unwrap(),
+    ]
+}
+
+fn get_desired_throw(t: Throw, result: &str) -> Result<Throw, Error> {
+    match result {
+        "X" => match t {
+            Throw::Rock => Ok(Throw::Scissors),
+            Throw::Paper => Ok(Throw::Rock),
+            Throw::Scissors => Ok(Throw::Paper),
+        },
+        "Y" => match t {
+            Throw::Rock => Ok(Throw::Rock),
+            Throw::Paper => Ok(Throw::Paper),
+            Throw::Scissors => Ok(Throw::Scissors),
+        },
+        "Z" => match t {
+            Throw::Rock => Ok(Throw::Paper),
+            Throw::Paper => Ok(Throw::Scissors),
+            Throw::Scissors => Ok(Throw::Rock),
+        },
+        _ => Err(Error::InvalidInput),
+    }
 }
 
 fn score_round(you: Throw, opp: Throw) -> i32 {
