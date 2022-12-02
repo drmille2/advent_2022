@@ -23,21 +23,18 @@ fn main() {
     let input = &fs::read_to_string(cli_args.input).unwrap();
     let rounds = input.split_terminator("\n");
 
-    //
-    // Part 1 solution
-    //
-
-    let mut sum = 0;
-    for (idx, round) in rounds.enumerate() {
-        println!("Scoring round {}", round);
-        // parser for part 1
-        // let throws = parse_round_as_throws(round);
-        let throws = parse_round_as_result(round); // parser for part 2
-        let score = score_round(throws[1], throws[0]);
-        sum += score;
-        println!("Round {} score: {}\n", idx, score);
+    let mut sum_p1 = 0;
+    let mut sum_p2 = 0;
+    for round in rounds {
+        let throws_p1 = parse_round_as_throws(round); //parser for part 1
+        let throws_p2 = parse_round_as_result(round); // parser for part 2
+        let score_p1 = score_round(throws_p1[1], throws_p1[0]);
+        let score_p2 = score_round(throws_p2[1], throws_p2[0]);
+        sum_p1 += score_p1;
+        sum_p2 += score_p2;
     }
-    println!("Final score: {}", sum);
+    println!("Final score (Part 1): {}", sum_p1);
+    println!("Final score (Part 2): {}", sum_p2);
 }
 
 #[derive(Eq, PartialEq, Primitive, Copy, Clone)]
