@@ -1,0 +1,13 @@
+[package]
+name = "day_2"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.0.29", features = ["derive"] }
+enum-primitive-derive = "0.2.2"
+num-derive = { version = "0.3.3", features = ["full-syntax"] }
+num-traits = { version = "0.2.15", features = ["i128"] }
+thiserror = "1.0.37"
