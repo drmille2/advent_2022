@@ -24,6 +24,14 @@ fn check_range_inclusion(r: &Vec<usize>, s: &Vec<usize>) -> bool {
     (r[0] >= s[0] && r[1] <= s[1]) || (s[0] >= r[0] && s[1] <= r[1])
 }
 
+fn check_range_overlap(r: &Vec<usize>, s: &Vec<usize>) -> bool {
+    if r[0] <= s[0] {
+        r[1] >= s[0]
+    } else {
+        s[1] >= r[0]
+    }
+}
+
 fn solve_part1(s: &str) -> usize {
     s.split_terminator("\n")
         .map(to_ranges)
@@ -37,15 +45,29 @@ fn solve_part1(s: &str) -> usize {
         .sum()
 }
 
+fn solve_part2(s: &str) -> usize {
+    s.split_terminator("\n")
+        .map(to_ranges)
+        .map(|x| {
+            if check_range_overlap(&x[0], &x[1]) {
+                1
+            } else {
+                0
+            }
+        })
+        .sum()
+}
+
 fn main() {
     let cli_args = Cli::parse();
     let input = &fs::read_to_string(cli_args.input).unwrap();
     println!("Part 1: {}", solve_part1(input));
+    println!("Part 2: {}", solve_part2(input));
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{check_range_inclusion, to_ranges};
+    use crate::{check_range_inclusion, check_range_overlap, to_ranges};
 
     #[test]
     fn test_to_ranges() {
@@ -58,6 +80,15 @@ mod test {
     fn test_check_range_inclusion() {
         assert!(check_range_inclusion(&vec![2, 3], &vec![2, 4]));
         assert!(check_range_inclusion(&vec![6, 6], &vec![4, 6]));
-        assert!(!check_range_inclusion(&vec![2, 4], &vec![6, 8]))
+        assert!(!check_range_inclusion(&vec![2, 4], &vec![6, 8]));
+    }
+
+    #[test]
+    fn test_check_range_overlap() {
+        assert!(check_range_overlap(&vec![2, 3], &vec![2, 4]));
+        assert!(check_range_overlap(&vec![6, 6], &vec![4, 6]));
+        assert!(!check_range_overlap(&vec![2, 4], &vec![6, 8]));
+        assert!(check_range_overlap(&vec![2, 5], &vec![4, 6]));
+        assert!(!check_range_overlap(&vec![7, 8], &vec![5, 6]));
     }
 }
