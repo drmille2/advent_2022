@@ -120,9 +120,9 @@ impl Crt {
             let mut row_string = String::new();
             row.iter().for_each(|x| {
                 if *x {
-                    row_string.push_str("#")
+                    row_string.push_str("█")
                 } else {
-                    row_string.push_str(".")
+                    row_string.push_str(" ")
                 }
             });
             println!("{}", row_string);
