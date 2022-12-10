@@ -13,7 +13,7 @@ struct Cli {
     input: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Dir {
     L,
     R,
@@ -34,94 +34,70 @@ struct Coords {
 
 #[derive(Debug)]
 struct State {
-    head: Coords,
-    head_hist: Vec<Coords>,
-    tail: Coords,
+    segments: Vec<Coords>,
+    // head: Coords,
+    // tail: Coords,
     tail_hist: Vec<Coords>,
 }
 
 impl State {
-    fn new() -> Self {
+    fn new(len: usize) -> Self {
+        let mut segments = Vec::new();
+        for _ in 0..len {
+            segments.push(Coords { x: 0, y: 0 })
+        }
         State {
-            head: Coords { x: 0, y: 0 },
-            tail: Coords { x: 0, y: 0 },
-            head_hist: vec![Coords { x: 0, y: 0 }],
+            segments,
+            // head: Coords { x: 0, y: 0 },
+            // tail: Coords { x: 0, y: 0 },
             tail_hist: vec![Coords { x: 0, y: 0 }],
         }
     }
 
-    fn move_head(&mut self, dir: Dir) {
+    fn move_segment(&mut self, pos: usize, dir: Dir) {
         match dir {
-            Dir::U => self.head.y += 1,
-            Dir::D => self.head.y -= 1,
-            Dir::R => self.head.x += 1,
-            Dir::L => self.head.x -= 1,
+            Dir::U => self.segments[pos].y += 1,
+            Dir::D => self.segments[pos].y -= 1,
+            Dir::R => self.segments[pos].x += 1,
+            Dir::L => self.segments[pos].x -= 1,
             Dir::UR => {
-                self.head.y += 1;
-                self.head.x += 1
+                self.segments[pos].y += 1;
+                self.segments[pos].x += 1
             }
             Dir::UL => {
-                self.head.y += 1;
-                self.head.x -= 1
+                self.segments[pos].y += 1;
+                self.segments[pos].x -= 1
             }
             Dir::DR => {
-                self.head.y -= 1;
-                self.head.x += 1
+                self.segments[pos].y -= 1;
+                self.segments[pos].x += 1
             }
             Dir::DL => {
-                self.head.y -= 1;
-                self.head.x -= 1
+                self.segments[pos].y -= 1;
+                self.segments[pos].x -= 1
             }
             Dir::NS => (),
         }
-        println!("moving head {:?} to {:?}", dir, self.head);
-        self.head_hist.push(self.head.clone());
-    }
-
-    fn move_tail(&mut self, dir: Dir) {
-        match dir {
-            Dir::U => self.tail.y += 1,
-            Dir::D => self.tail.y -= 1,
-            Dir::R => self.tail.x += 1,
-            Dir::L => self.tail.x -= 1,
-            Dir::UR => {
-                self.tail.y += 1;
-                self.tail.x += 1
-            }
-            Dir::UL => {
-                self.tail.y += 1;
-                self.tail.x -= 1
-            }
-            Dir::DR => {
-                self.tail.y -= 1;
-                self.tail.x += 1
-            }
-            Dir::DL => {
-                self.tail.y -= 1;
-                self.tail.x -= 1
-            }
-            Dir::NS => (),
+        if pos + 1 == self.segments.len() {
+            self.tail_hist.push(self.segments[pos].clone())
         }
-        println!("moving tail {:?} to {:?}", dir, self.tail);
-        self.tail_hist.push(self.tail.clone());
     }
 
-    fn calc_tail_move(&self) -> Dir {
+    fn calc_tail_move(&self, pos: usize) -> Dir {
         let res: Dir;
-        if (self.head.x - self.tail.x).abs() <= 1 && (self.head.y - self.tail.y).abs() <= 1 {
+        if (self.segments[pos - 1].x - self.segments[pos].x).abs() <= 1
+            && (self.segments[pos - 1].y - self.segments[pos].y).abs() <= 1
+        {
             // touching, no move needed
             res = Dir::NS;
         } else {
             // not touching, check straight vs diagonal move
-            // if (self.head.x - self.tail.x).abs() > 1 && (self.head.y - self.tail.y).abs() > 1 {
-            if (self.head.x != self.tail.x) && (self.head.y != self.tail.y) {
-                // if ((self.head.x - self.tail.x).abs() > 1 && (self.head.y != self.tail.y))
-                //     || ((self.head.y - self.tail.y).abs() > 1 && (self.head.x != self.tail.x))
-                // {
+            if (self.segments[pos - 1].x != self.segments[pos].x)
+                && (self.segments[pos - 1].y != self.segments[pos].y)
+            {
                 // diagonal move needed
-                let dx = self.head.x - self.tail.x;
-                let dy = self.head.y - self.tail.y;
-                println!("calculating diagonal, dx = {}, dy = {}", dx, dy);
+                let dx = self.segments[pos - 1].x - self.segments[pos].x;
+                let dy = self.segments[pos - 1].y - self.segments[pos].y;
                 if dx > 0 && dy > 0 {
                     res = Dir::UR;
                 } else if dx > 0 && dy < 0 {
@@ -133,14 +109,14 @@ impl State {
                 }
             } else {
                 // straight move needed
-                if self.head.x != self.tail.x {
-                    if self.head.x - self.tail.x > 0 {
+                if self.segments[pos - 1].x != self.segments[pos].x {
+                    if self.segments[pos - 1].x - self.segments[pos].x > 0 {
                         res = Dir::R;
                     } else {
                         res = Dir::L;
                     }
                 } else {
-                    if self.head.y - self.tail.y > 0 {
+                    if self.segments[pos - 1].y - self.segments[pos].y > 0 {
                         res = Dir::U;
                     } else {
                         res = Dir::D;
@@ -155,13 +131,13 @@ impl State {
         steps
             .into_iter()
             .map(|x| {
-                self.move_head(x);
-                self.move_tail(self.calc_tail_move());
-                println!(
-                    "dx {}, dy {} \n",
-                    self.head.x - self.tail.x,
-                    self.head.y - self.tail.y
-                );
+                for pos in 0..(self.segments.len()) {
+                    if pos == 0 {
+                        self.move_segment(pos, x.clone())
+                    } else {
+                        self.move_segment(pos, self.calc_tail_move(pos))
+                    }
+                }
             })
             .for_each(drop);
     }
@@ -173,8 +149,6 @@ fn parse_input(s: &str) -> Vec<Dir> {
         let elems: Vec<&str> = row.split(" ").collect();
         let steps = elems[1].parse().unwrap_or_default();
 
-        // let chars: Vec<char> = row.chars().collect();
-        // for _ in 0..chars[2].to_digit(10).unwrap_or_default() {
         for _ in 0..steps {
             match elems[0] {
                 "L" => out.push(Dir::L),
@@ -190,22 +164,26 @@ fn parse_input(s: &str) -> Vec<Dir> {
 
 fn solve_part1(s: &str) -> usize {
     let steps = parse_input(s);
-    let mut state = State::new();
-    println!("{:?}", steps);
+    let mut state = State::new(2);
     state.do_steps(steps);
-    // println!("final head location {:?}", state.head);
     let mut unique_locs: HashSet<Coords> = HashSet::new();
-    // println!("all visited locations {:?}", state.tail_hist);
     for loc in state.tail_hist {
         unique_locs.insert(loc);
     }
 
-    // println!("unique visited locations {:?}", unique_locs);
     unique_locs.len()
 }
 
 fn solve_part2(s: &str) -> usize {
-    0
+    let steps = parse_input(s);
+    let mut state = State::new(10);
+    state.do_steps(steps);
+    let mut unique_locs: HashSet<Coords> = HashSet::new();
+    for loc in state.tail_hist {
+        unique_locs.insert(loc);
+    }
+
+    unique_locs.len()
 }
 
 fn main() {
