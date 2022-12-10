@@ -94,7 +94,7 @@ impl Crt {
     }
 
     fn draw_pixel(&mut self, r1: i64) {
-        println!("drawing pixel at row {} pos {}", self.row_num, self.pos);
+        // println!("drawing pixel at row {} pos {}", self.row_num, self.pos);
         if self.pos as i64 >= (r1 - 1) && self.pos as i64 <= (r1 + 1) {
             self.rows[self.row_num][self.pos] = true
         } else {
@@ -113,7 +113,7 @@ impl Crt {
     }
 
     fn render(&self) {
-        println!("Rendering display\n");
+        // println!("Rendering display\n");
         for row in self.rows.clone() {
             let mut row_string = String::new();
             row.iter().for_each(|x| {
@@ -179,6 +179,6 @@ fn main() {
     let cli_args = Cli::parse();
     let input = &fs::read_to_string(cli_args.input).unwrap();
     println!("Part 1: {}", solve_part1(input));
-    println!("Part 2\n");
+    println!("Part 2:\n");
     solve_part2(input);
 }
