@@ -19,7 +19,6 @@ struct Cpu {
     cur_op: Op,
     ops: VecDeque<Op>,
     cyc: usize,
-    breaks: Vec<usize>,
 }
 
 impl Cpu {
@@ -29,7 +28,6 @@ impl Cpu {
             cyc: 1,
             cur_op: ops.pop_front().unwrap(),
             ops: ops.clone(),
-            breaks: Vec::new(),
         }
     }
 
