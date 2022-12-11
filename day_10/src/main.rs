@@ -147,12 +147,7 @@ fn solve_part1(s: &str) -> i64 {
     loop {
         let diag = cpu.get_state();
         if [20, 60, 100, 140, 180, 220].contains(&diag.0) {
-            let val = diag.0 as i64 * diag.1;
-            // println!(
-            //     "op={:?}, cyc={}, r1={}, val={}",
-            //     diag.2, diag.0, diag.1, val
-            // );
-            sum += val;
+            sum += diag.0 as i64 * diag.1;
         }
         if let None = cpu.do_op() {
             break;
