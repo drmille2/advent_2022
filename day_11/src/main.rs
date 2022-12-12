@@ -15,29 +15,32 @@ struct Cli {
 
 #[derive(Debug, Clone)]
 struct Monkey {
-    items: VecDeque<u128>,
+    items: VecDeque<usize>,
     op: Op,
-    test_div: u128,
+    test_div: usize,
     if_true: usize,
     if_false: usize,
     ins_count: usize,
 }
 
 impl Monkey {
-    fn inspect(&mut self) -> Option<u128> {
+    fn inspect(&mut self) -> Option<usize> {
         if let Some(item) = self.items.pop_front() {
             let item = match self.op {
                 Op::Add(val) => item + val,
-                Op::Mult(val) => dbg!(item * val),
+                Op::Mult(val) => item * val,
                 Op::Square => item * item,
             };
             self.ins_count += 1;
-            Some(item / 3)
+            // it's a ring dummy
+            Some(item % (2 * 3 * 5 * 7 * 11 * 13 * 17 * 19))
+            // Some(item % (13 * 17 * 19 * 23))  // part 2 test input
+            // Some(item / 3) part 1 test input
         } else {
             None
         }
     }
-    fn throw(&mut self) -> Option<(usize, u128)> {
+    fn throw(&mut self) -> Option<(usize, usize)> {
         if let Some(item) = self.inspect() {
             if item % self.test_div == 0 {
                 Some((self.if_true, item))
@@ -49,7 +52,7 @@ impl Monkey {
         }
     }
 
-    fn catch(&mut self, item: u128) {
+    fn catch(&mut self, item: usize) {
         self.items.push_back(item);
     }
 }
@@ -102,8 +105,8 @@ impl Barrel {
 
 #[derive(Debug, Clone)]
 enum Op {
-    Add(u128),
-    Mult(u128),
+    Add(usize),
+    Mult(usize),
     Square,
 }
 
@@ -126,7 +129,7 @@ fn group_items(items: Vec<&str>, group_len: usize) -> Vec<Vec<&str>> {
     out
 }
 
-fn parse_starting_items(s: &str) -> VecDeque<u128> {
+fn parse_starting_items(s: &str) -> VecDeque<usize> {
     let mut out = VecDeque::new();
     let items_str = s.split_once(":").unwrap().1;
     for item in items_str.split(",") {
@@ -156,16 +159,16 @@ fn parse_op(s: &str) -> Op {
     }
 }
 
-fn parse_last_num(s: &str) -> u128 {
+fn parse_last_num(s: &str) -> usize {
     s.split(" ").reduce(|_, i| i).unwrap().parse().unwrap()
 }
 
-fn parse_test_div(s: &str) -> u128 {
-    parse_last_num(s)
+fn parse_test_div(s: &str) -> usize {
+    parse_last_num(s) as usize
 }
 
 fn parse_throw(s: (&str, &str)) -> (usize, usize) {
-    (parse_last_num(s.0) as usize, parse_last_num(s.1) as usize)
+    (parse_last_num(s.0), parse_last_num(s.1))
 }
 
 fn solve_part1(s: &str) -> usize {
@@ -180,12 +183,13 @@ fn solve_part1(s: &str) -> usize {
 
 fn solve_part2(s: &str) -> usize {
     let mut barrel = Barrel::from_str(s);
-    for r in 0..7000 {
+    for r in 0..10000 {
         dbg!(r);
         barrel.do_round();
     }
     let mut sorted_monkeys = barrel.monkeys.clone();
     sorted_monkeys.sort_by(|a, b| b.ins_count.cmp(&a.ins_count));
+    dbg!(&sorted_monkeys);
     sorted_monkeys[0].ins_count * sorted_monkeys[1].ins_count
 }
 
