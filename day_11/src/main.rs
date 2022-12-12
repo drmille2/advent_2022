@@ -183,13 +183,11 @@ fn solve_part1(s: &str) -> usize {
 
 fn solve_part2(s: &str) -> usize {
     let mut barrel = Barrel::from_str(s);
-    for r in 0..10000 {
-        dbg!(r);
+    for _r in 0..10000 {
         barrel.do_round();
     }
     let mut sorted_monkeys = barrel.monkeys.clone();
     sorted_monkeys.sort_by(|a, b| b.ins_count.cmp(&a.ins_count));
-    dbg!(&sorted_monkeys);
     sorted_monkeys[0].ins_count * sorted_monkeys[1].ins_count
 }
 
