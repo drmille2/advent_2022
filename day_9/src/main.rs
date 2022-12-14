@@ -115,12 +115,10 @@ impl State {
                     } else {
                         res = Dir::L;
                     }
+                } else if self.segments[pos - 1].y - self.segments[pos].y > 0 {
+                    res = Dir::U;
                 } else {
-                    if self.segments[pos - 1].y - self.segments[pos].y > 0 {
-                        res = Dir::U;
-                    } else {
-                        res = Dir::D;
-                    }
+                    res = Dir::D;
                 }
             }
         }
@@ -145,8 +143,8 @@ impl State {
 
 fn parse_input(s: &str) -> Vec<Dir> {
     let mut out = Vec::new();
-    for row in s.split_terminator("\n") {
-        let elems: Vec<&str> = row.split(" ").collect();
+    for row in s.split_terminator('\n') {
+        let elems: Vec<&str> = row.split(' ').collect();
         let steps = elems[1].parse().unwrap_or_default();
 
         for _ in 0..steps {

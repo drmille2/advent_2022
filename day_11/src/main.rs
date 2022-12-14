@@ -65,12 +65,12 @@ struct Barrel {
 impl Barrel {
     fn from_str(s: &str) -> Self {
         let mut monkeys = Vec::new();
-        let rows = s.split_terminator("\n").collect();
+        let rows = s.split_terminator('\n').collect();
         for monkey_str in group_items(rows, 7) {
             let items = parse_starting_items(monkey_str[1]);
             let op = parse_op(monkey_str[2]);
             let test_div = parse_test_div(monkey_str[3]);
-            let (if_true, if_false) = parse_throw((&monkey_str[4], &monkey_str[5]));
+            let (if_true, if_false) = parse_throw((monkey_str[4], monkey_str[5]));
             monkeys.push(Monkey {
                 items,
                 op,
@@ -92,12 +92,8 @@ impl Barrel {
     }
     fn do_round(&mut self) {
         for m in 0..self.monkeys.len() {
-            loop {
-                if let Some(_) = self.throw_and_catch(m) {
-                    continue;
-                } else {
-                    break;
-                }
+            while self.throw_and_catch(m).is_some() {
+                continue;
             }
         }
     }
@@ -131,8 +127,8 @@ fn group_items(items: Vec<&str>, group_len: usize) -> Vec<Vec<&str>> {
 
 fn parse_starting_items(s: &str) -> VecDeque<usize> {
     let mut out = VecDeque::new();
-    let items_str = s.split_once(":").unwrap().1;
-    for item in items_str.split(",") {
+    let items_str = s.split_once(':').unwrap().1;
+    for item in items_str.split(',') {
         out.push_back(item.trim().parse().unwrap());
     }
     out
@@ -140,19 +136,19 @@ fn parse_starting_items(s: &str) -> VecDeque<usize> {
 
 fn parse_op(s: &str) -> Op {
     let trimmed: Vec<&str> = s
-        .split_once("=")
+        .split_once('=')
         .unwrap()
         .1
         .trim_start()
-        .split(" ")
+        .split(' ')
         .collect();
     match trimmed[1] {
-        "+" => return Op::Add(trimmed[2].parse().unwrap()),
+        "+" => Op::Add(trimmed[2].parse().unwrap()),
         "*" => {
             if let Ok(num) = trimmed[2].parse() {
-                return Op::Mult(num);
+                Op::Mult(num)
             } else {
-                return Op::Square;
+                Op::Square
             }
         }
         _ => panic!("invalid operation encountered"),
@@ -160,11 +156,11 @@ fn parse_op(s: &str) -> Op {
 }
 
 fn parse_last_num(s: &str) -> usize {
-    s.split(" ").reduce(|_, i| i).unwrap().parse().unwrap()
+    s.split(' ').reduce(|_, i| i).unwrap().parse().unwrap()
 }
 
 fn parse_test_div(s: &str) -> usize {
-    parse_last_num(s) as usize
+    parse_last_num(s)
 }
 
 fn parse_throw(s: (&str, &str)) -> (usize, usize) {

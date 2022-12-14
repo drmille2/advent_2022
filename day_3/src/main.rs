@@ -27,10 +27,10 @@ fn main() {
 
 fn to_priority(item: &char) -> Option<i32> {
     let offset: i32 = if item.is_lowercase() { -9 } else { 17 };
-    item.to_digit(36).and_then(|x| Some(x as i32 + offset))
+    item.to_digit(36).map(|x| x as i32 + offset)
 }
 
-fn sep_compartments<'a>(sack: &'a str) -> (&'a str, &'a str) {
+fn sep_compartments(sack: &str) -> (&str, &str) {
     sack.split_at(sack.len() / 2)
 }
 
@@ -77,7 +77,7 @@ fn find_common_elements(group: Vec<&str>) -> Vec<char> {
         sets.push(set);
     }
     sets.into_iter()
-        .reduce(|a, i| i.intersection(&a).map(|x| *x).collect::<HashSet<char>>())
+        .reduce(|a, i| i.intersection(&a).copied().collect::<HashSet<char>>())
         .unwrap()
         .into_iter()
         .collect::<Vec<char>>()
@@ -85,7 +85,7 @@ fn find_common_elements(group: Vec<&str>) -> Vec<char> {
 
 fn solve_part1(input: &str) -> i32 {
     input
-        .split_terminator("\n")
+        .split_terminator('\n')
         .map(sep_compartments)
         .map(return_duplicates)
         .map(|x| x.into_iter().map(|y| to_priority(&y).unwrap()).sum::<i32>())
@@ -93,7 +93,7 @@ fn solve_part1(input: &str) -> i32 {
 }
 
 fn solve_part2(input: &str) -> i32 {
-    group_items(input.split_terminator("\n").collect(), 3)
+    group_items(input.split_terminator('\n').collect(), 3)
         .into_iter()
         .map(find_common_elements)
         .map(|x| x.into_iter().map(|y| to_priority(&y).unwrap()).sum::<i32>())

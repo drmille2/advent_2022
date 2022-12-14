@@ -43,7 +43,7 @@ fn mod_group_items(items: Vec<usize>, modulo: usize) -> Vec<Vec<usize>> {
 }
 
 fn parse_forest(s: &str) -> Forest {
-    let mut rows_iter = s.split_terminator("\n").peekable();
+    let mut rows_iter = s.split_terminator('\n').peekable();
     let row_length = rows_iter.peek().unwrap().len();
 
     let mut rows = Vec::new();
@@ -76,17 +76,15 @@ fn get_visible(trees: Vec<Vec<usize>>, is_col: bool, visible: &mut HashSet<(usiz
     for (line_num, line) in trees.iter().enumerate() {
         let line_len = line.len();
         line.iter().enumerate().fold((0, 0), |a, i| {
-            let coords: (usize, usize);
-            if is_col {
-                coords = (i.0, line_num);
+            let coords: (usize, usize) = if is_col {
+                (i.0, line_num)
             } else {
-                coords = (line_num, i.0);
+                (line_num, i.0)
             };
-            if line_num == 0 || line_num == (num_lines - 1) {
-                visible.insert(coords);
-            } else if i.0 == 0 || i.0 == (line_len - 1) {
-                visible.insert(coords);
-            } else if i.1 > &a.1 {
+            if (line_num == 0 || line_num == (num_lines - 1))
+                || (i.0 == 0 || i.0 == (line_len - 1))
+                || (i.1 > &a.1)
+            {
                 visible.insert(coords);
             };
             if i.1 > &a.1 {
@@ -97,20 +95,18 @@ fn get_visible(trees: Vec<Vec<usize>>, is_col: bool, visible: &mut HashSet<(usiz
         });
     }
     for (line_num, line) in trees.iter().enumerate() {
-        let line_len = line.len();
         line.iter().rev().enumerate().fold((0, 0), |a, i| {
             // count backwards this time
-            let coords: (usize, usize);
-            if is_col {
-                coords = (num_lines - i.0 - 1, line_num);
+            let line_len = line.len();
+            let coords: (usize, usize) = if is_col {
+                (num_lines - i.0 - 1, line_num)
             } else {
-                coords = (line_num, num_lines - i.0 - 1);
+                (line_num, num_lines - i.0 - 1)
             };
-            if line_num == 0 || line_num == (num_lines - 1) {
-                visible.insert(coords);
-            } else if i.0 == 0 || i.0 == (line_len - 1) {
-                visible.insert(coords);
-            } else if i.1 > &a.1 {
+            if (line_num == 0 || line_num == (num_lines - 1))
+                || (i.0 == 0 || i.0 == (line_len - 1))
+                || (i.1 > &a.1)
+            {
                 visible.insert(coords);
             };
             if i.1 > &a.1 {

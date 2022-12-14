@@ -37,7 +37,7 @@ fn school_girl(input: &str) -> Vec<(usize, i32)> {
 }
 
 fn sum_str_list(s: &str) -> i32 {
-    let nums = s.split("\n");
+    let nums = s.split('\n');
     let mut sum: i32 = 0;
     for n in nums {
         // since we're summing, or_default works here (giving 0 on empty)
@@ -53,7 +53,7 @@ fn chest_hair(input: &str) -> Vec<(usize, i32)> {
     let num_groups = input.split("\n\n");
     let mut ans = num_groups
         // split each elf into indiv entries
-        .map(|g| g.split("\n"))
+        .map(|g| g.split('\n'))
         .map(|nums| {
             // convert str -> int
             nums.map(|n| n.parse::<i32>().unwrap_or_default())

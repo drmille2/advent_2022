@@ -21,7 +21,7 @@ fn main() {
     let cli_args = Cli::parse();
 
     let input = &fs::read_to_string(cli_args.input).unwrap();
-    let rounds = input.split_terminator("\n");
+    let rounds = input.split_terminator('\n');
 
     let mut sum_p1 = 0;
     let mut sum_p2 = 0;
@@ -33,8 +33,8 @@ fn main() {
         sum_p1 += score_p1;
         sum_p2 += score_p2;
     }
-    println!("Final score (Part 1): {}", sum_p1);
-    println!("Final score (Part 2): {}", sum_p2);
+    println!("Final score (Part 1): {sum_p1}");
+    println!("Final score (Part 2): {sum_p2}");
 }
 
 #[derive(Eq, PartialEq, Primitive, Copy, Clone)]
@@ -86,13 +86,13 @@ impl FromStr for Throw {
 }
 
 fn parse_round_as_throws(s: &str) -> Vec<Throw> {
-    s.split_terminator(" ")
+    s.split_terminator(' ')
         .map(|t| Throw::from_str(t).unwrap())
         .collect()
 }
 
 fn parse_round_as_result(s: &str) -> Vec<Throw> {
-    let entries: Vec<&str> = s.split_terminator(" ").collect();
+    let entries: Vec<&str> = s.split_terminator(' ').collect();
     vec![
         Throw::from_str(entries[0]).unwrap(),
         get_desired_throw(Throw::from_str(entries[0]).unwrap(), entries[1]).unwrap(),
@@ -124,7 +124,7 @@ fn score_round(you: Throw, opp: Throw) -> i32 {
     if you > opp {
         you.to_i32().unwrap() + 6
     } else if you < opp {
-        you.to_i32().unwrap() + 0
+        you.to_i32().unwrap()
     } else {
         you.to_i32().unwrap() + 3
     }

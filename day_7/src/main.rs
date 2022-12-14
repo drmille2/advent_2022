@@ -31,7 +31,7 @@ impl State {
         if dir == ".." {
             self.crumbs.pop();
         } else {
-            self.crumbs.push(dir.clone());
+            self.crumbs.push(dir);
         }
     }
 
@@ -50,16 +50,12 @@ impl State {
 
     fn run_cmd(&mut self, cmd: &str) {
         if cmd.starts_with("$ cd") {
-            let command = &cmd
-                .split(" ")
-                .map(|x| String::from(x))
-                .collect::<Vec<String>>()[2];
+            let command = &cmd.split(' ').map(String::from).collect::<Vec<String>>()[2];
             self.do_cd(command.clone());
-            return;
         } else if cmd.starts_with("$ ls") || cmd.starts_with("dir") {
             return;
         } else {
-            let fsize: usize = cmd.split(" ").collect::<Vec<&str>>()[0].parse().unwrap();
+            let fsize: usize = cmd.split(' ').collect::<Vec<&str>>()[0].parse().unwrap();
             self.add_file(fsize);
         }
     }
@@ -68,7 +64,7 @@ impl State {
 fn render_wd(path: &Vec<String>) -> String {
     let mut output = String::new();
     for dir in path {
-        output.push_str(&dir);
+        output.push_str(dir);
         if dir != "/" {
             output.push('/');
         }
@@ -78,7 +74,7 @@ fn render_wd(path: &Vec<String>) -> String {
 
 fn solve_part1(s: &str) -> usize {
     let mut state = State::new();
-    let commands = s.split_terminator("\n");
+    let commands = s.split_terminator('\n');
     for cmd in commands {
         state.run_cmd(cmd);
     }
@@ -94,7 +90,7 @@ fn solve_part1(s: &str) -> usize {
 
 fn solve_part2(s: &str) -> usize {
     let mut state = State::new();
-    let commands = s.split_terminator("\n");
+    let commands = s.split_terminator('\n');
     for cmd in commands {
         state.run_cmd(cmd);
     }

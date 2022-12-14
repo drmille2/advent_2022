@@ -37,15 +37,15 @@ impl Cpu {
                 if cyc == 0 {
                     self.cur_op = Op::Addx((1, val));
                     self.cyc += 1;
-                    return Some(true);
+                    Some(true)
                 } else {
                     self.r1 += val;
                     if let Some(op) = self.ops.pop_front() {
                         self.cur_op = op;
                         self.cyc += 1;
-                        return Some(true);
+                        Some(true)
                     } else {
-                        return None;
+                        None
                     }
                 }
             }
@@ -53,20 +53,16 @@ impl Cpu {
                 if let Some(op) = self.ops.pop_front() {
                     self.cur_op = op;
                     self.cyc += 1;
-                    return Some(true);
+                    Some(true)
                 } else {
-                    return None;
+                    None
                 }
             }
         }
     }
 
     fn get_state(&self) -> (usize, i64, Op) {
-        // println!(
-        //     "DEBUG: CYC={}, OP={:?}, R1={}",
-        //     self.cyc, self.cur_op, self.r1
-        // );
-        return (self.cyc, self.r1, self.cur_op.clone());
+        (self.cyc, self.r1, self.cur_op.clone())
     }
 }
 
@@ -118,20 +114,20 @@ impl Crt {
             let mut row_string = String::new();
             row.iter().for_each(|x| {
                 if *x {
-                    row_string.push_str("█")
+                    row_string.push('█')
                 } else {
-                    row_string.push_str(" ")
+                    row_string.push(' ')
                 }
             });
-            println!("{}", row_string);
+            println!("{row_string}");
         }
     }
 }
 
 fn parse_input(s: &str) -> VecDeque<Op> {
     let mut out = VecDeque::new();
-    for row in s.split_terminator("\n") {
-        let elems: Vec<&str> = row.split(" ").collect();
+    for row in s.split_terminator('\n') {
+        let elems: Vec<&str> = row.split(' ').collect();
         match elems[0] {
             "addx" => out.push_back(Op::Addx((0, elems[1].parse().unwrap_or_default()))),
             _ => out.push_back(Op::Noop),
@@ -149,7 +145,7 @@ fn solve_part1(s: &str) -> i64 {
         if [20, 60, 100, 140, 180, 220].contains(&diag.0) {
             sum += diag.0 as i64 * diag.1;
         }
-        if let None = cpu.do_op() {
+        if cpu.do_op().is_none() {
             break;
         }
     }
@@ -163,7 +159,7 @@ fn solve_part2(s: &str) {
     loop {
         let state = cpu.get_state();
         crt.draw_pixel(state.1);
-        if let None = cpu.do_op() {
+        if cpu.do_op().is_none() {
             break;
         }
     }

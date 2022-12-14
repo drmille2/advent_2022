@@ -13,7 +13,7 @@ struct Cli {
     input: String,
 }
 
-fn split_input<'a>(s: &'a str) -> Vec<&'a str> {
+fn split_input(s: &str) -> Vec<&str> {
     s.split("\n\n").collect()
 }
 
@@ -28,7 +28,7 @@ fn parse_stacks(s: &str) -> Vec<VecDeque<char>> {
 
     // parse each row and send elements to their
     // corresponding stack
-    for row in s.split("\n") {
+    for row in s.split('\n') {
         let mut row = String::from(row);
         row.push(' '); // our rows are 1 short for group_items to work, pad it out
         let columns = group_items(row.chars().collect::<Vec<char>>(), 4);
@@ -46,7 +46,7 @@ fn to_elfbox(s: &str) -> Option<char> {
     if s.trim_start().is_empty() {
         return None;
     }
-    let res = s.trim_start_matches("[").chars().next().unwrap();
+    let res = s.trim_start_matches('[').chars().next().unwrap();
     if res.is_alphabetic() {
         Some(res)
     } else {
@@ -77,13 +77,13 @@ fn group_items(items: Vec<char>, group_len: usize) -> Vec<String> {
     out
 }
 
-fn parse_operations<'a>(s: &'a str) -> Vec<Vec<usize>> {
+fn parse_operations(s: &str) -> Vec<Vec<usize>> {
     let mut out = Vec::new();
-    for op_string in s.split("\n") {
+    for op_string in s.split('\n') {
         let mut op = Vec::new();
         for o in op_string
             .replace(|x: char| x.is_alphabetic(), "")
-            .split(" ")
+            .split(' ')
         {
             if !o.is_empty() {
                 op.push(o.parse::<usize>().unwrap());
@@ -94,14 +94,14 @@ fn parse_operations<'a>(s: &'a str) -> Vec<Vec<usize>> {
     out
 }
 
-fn do_operation(stacks: &mut Vec<VecDeque<char>>, op: &Vec<usize>) {
+fn do_operation(stacks: &mut [VecDeque<char>], op: &[usize]) {
     for _ in 0..op[0] {
         let elfbox = stacks[op[1] - 1].pop_front().unwrap();
         stacks[op[2] - 1].push_front(elfbox);
     }
 }
 
-fn do_operation_p2(stacks: &mut Vec<VecDeque<char>>, op: &Vec<usize>) {
+fn do_operation_p2(stacks: &mut [VecDeque<char>], op: &[usize]) {
     let mut elfboxes = VecDeque::new();
     for _ in 0..op[0] {
         elfboxes.push_back(stacks[op[1] - 1].pop_front().unwrap());
@@ -126,8 +126,8 @@ fn solve_part1(s: &str) -> String {
     for op in operations {
         do_operation(&mut stacks, &op);
     }
-    for n in 0..stacks.len() {
-        output.push(stacks[n][0]);
+    for stack in stacks {
+        output.push(stack[0]);
     }
     output
 }
@@ -140,8 +140,8 @@ fn solve_part2(s: &str) -> String {
     for op in operations {
         do_operation_p2(&mut stacks, &op);
     }
-    for n in 0..stacks.len() {
-        output.push(stacks[n][0]);
+    for stack in stacks {
+        output.push(stack[0]);
     }
     output
 }
