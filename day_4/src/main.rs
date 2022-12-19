@@ -6,7 +6,7 @@ use clap::Parser;
 #[command(
     author = "David Miller",
     version = "v1.0.0",
-    about = "Advent of Code (Day 3)"
+    about = "Advent of Code (Day 4)"
 )]
 
 struct Cli {
